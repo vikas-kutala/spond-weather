@@ -52,7 +52,7 @@ public class EventForecastService {
         return aggregateAndMapToEventForecastDto(lat, lon, startTime, endTime, eventForecast);
     }
 
-    private int findBracketingIndex(List<ForecastTimeSeries> forecast, LocalDateTime timestamp, int fromIndex) {
+    static int findBracketingIndex(List<ForecastTimeSeries> forecast, LocalDateTime timestamp, int fromIndex) {
         for (int i = fromIndex; i < forecast.size() - 1; i++) {
             LocalDateTime currentTsTime = forecast.get(i).time();
             LocalDateTime nextTsTime = forecast.get(i + 1).time();
@@ -64,10 +64,10 @@ public class EventForecastService {
         return fromIndex;
     }
 
-    private EventForecastDto aggregateAndMapToEventForecastDto(Double lat, Double lon, LocalDateTime start,
-                                                               LocalDateTime end, List<ForecastTimeSeries> forecast) {
+    EventForecastDto aggregateAndMapToEventForecastDto(Double lat, Double lon, LocalDateTime start,
+                                                       LocalDateTime end, List<ForecastTimeSeries> forecast) {
         if (isEmpty(forecast)) {
-            return null;
+            return EventForecastDto.empty();
         }
 
         double airTemp = arithmeticMean(forecast, ForecastReading::airTemperature).getAsDouble();
@@ -77,7 +77,5 @@ public class EventForecastService {
                                     new DtoTypes.AirTemperature(roundAirTemp.apply(airTemp), DtoTypes.AirTempUnit.CELSIUS),
                                     new DtoTypes.WindSpeed(roundWindSpeed.apply(windSpeed), DtoTypes.WindSpeedUnit.MT_PER_SEC));
     }
-
-    ;
 
 }

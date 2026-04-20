@@ -31,9 +31,9 @@ public class EventForecastController {
 
     @GetMapping("/api/v1/weather/forecasts")
     public ResponseEntity<EventForecastDto> getForecast(@DecimalMin("-90.0") @DecimalMax("90.0") @NotNull @RequestParam Double lat,
-                                                        @DecimalMin("-90.0") @DecimalMax("90.0") @NotNull @RequestParam Double lon,
-                                                        @RequestParam LocalDateTime eventStartTime,
-                                                        @RequestParam LocalDateTime eventEndTime) {
+                                                        @DecimalMin("-180.0") @DecimalMax("180.0") @NotNull @RequestParam Double lon,
+                                                        @RequestParam @NotNull LocalDateTime eventStartTime,
+                                                        @RequestParam @NotNull LocalDateTime eventEndTime) {
 
         if (validateEventTimes.apply(eventStartTime, eventEndTime)) {
             return ResponseEntity.badRequest().build();
