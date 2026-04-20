@@ -11,9 +11,9 @@ public class CoordinateUtilsTest {
     @ParameterizedTest
     @CsvSource(textBlock = """
             0, 0
-            -20.0110, -20.02
+            -20.0110, -20.01
             20.0110, 20.01
-            98.98784, 98.98
+            98.98784, 98.99
             """
     )
     public void testRoundCoordinate(Double input, Double expected) {
