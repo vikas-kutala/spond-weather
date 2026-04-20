@@ -3,8 +3,13 @@ spring:
     name: spond-weather
   cache:
     type: caffeine
+    cacheNames: locationForecastService
     caffeine:
-      spec: maximumSize=10_000,expireAfterWrite=120m
+      spec: recordStats,maximumSize=10000,expireAfterWrite=120m
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 app:
   external:
@@ -13,14 +18,24 @@ app:
 
 resilience4j:
   circuitbreaker:
-    instances:
-      met-location-forecast-api:
+    configs:
+      default:
         slidingWindowType: COUNT_BASED
         slidingWindowSize: 10
         minimumNumberOfCalls: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
+        registerHealthIndicator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, circuitbreakers
+  health:
+    circuitbreakers:
+      enabled: true
 
 logging:
   level:

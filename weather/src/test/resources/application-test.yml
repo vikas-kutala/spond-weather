@@ -1,0 +1,4 @@
+app:
+  external:
+    met-no:
+      base-url: https://api.met.no/weatherapi

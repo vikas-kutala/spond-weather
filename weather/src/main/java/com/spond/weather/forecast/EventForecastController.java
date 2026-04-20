@@ -10,13 +10,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import static com.spond.weather.forecast.internal.RoundingUtils.roundCoordinate;
 import static com.spond.weather.forecast.infrastructure.DtoTypes.EventForecastDto;
+import static com.spond.weather.forecast.internal.RoundingUtils.roundCoordinate;
 
 @RestController
 @RequiredArgsConstructor
 public class EventForecastController {
+
+    private final BiFunction<LocalDateTime, LocalDateTime, Boolean> validateEventTimes = (start, end) -> {
+        LocalDateTime now = LocalDateTime.now();
+        return start.isAfter(now.plusDays(7L)) || end.isBefore(now) || start.isAfter(end);
+    };
+
+    private final Function<LocalDateTime, LocalDateTime> effectiveStartTime = start -> start.isAfter(LocalDateTime.now()) ? start : LocalDateTime.now();
 
     private final EventForecastService eventForecastService;
 
@@ -26,9 +35,13 @@ public class EventForecastController {
                                                         @RequestParam LocalDateTime eventStartTime,
                                                         @RequestParam LocalDateTime eventEndTime) {
 
+        if (validateEventTimes.apply(eventStartTime, eventEndTime)) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return ResponseEntity.ok(eventForecastService.getEventForecast(roundCoordinate.apply(lat),
                                                                        roundCoordinate.apply(lon),
-                                                                       eventStartTime,
+                                                                       effectiveStartTime.apply(eventStartTime),
                                                                        eventEndTime));
     }
 
